@@ -1,5 +1,7 @@
 
 import { useEffect, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowDown,
   ArrowRight,
@@ -196,23 +198,84 @@ function App() {
   const color = colors[selectedColor];
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
+    gsap.registerPlugin(ScrollTrigger);
+    const context = gsap.context(() => {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    document.querySelectorAll(".reveal").forEach((element) => {
-      observer.observe(element);
+      if (reduceMotion) {
+        gsap.set(".reveal", { autoAlpha: 1, y: 0 });
+        return;
+      }
+
+      gsap.set(".reveal", { autoAlpha: 0, y: 34 });
+      gsap.utils.toArray(".reveal").forEach((element) => {
+        gsap.to(element, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: element,
+            start: "top 88%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      });
+
+      gsap.fromTo(
+        ".hero-product .charger",
+        { y: 18, rotateZ: -3 },
+        {
+          y: -18,
+          rotateZ: 3,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.1,
+          },
+        }
+      );
+
+      gsap.to(".statement-orbit", {
+        rotate: 8,
+        scale: 1.12,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".statement-section",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.2,
+        },
+      });
+
+      gsap.to(".store-orbit-one", {
+        x: 130,
+        rotate: -12,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".store-section",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+
+      gsap.to(".store-orbit-two", {
+        x: -130,
+        rotate: 18,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".store-section",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
     });
 
-    return () => observer.disconnect();
+    return () => context.revert();
   }, []);
 
   useEffect(() => {
@@ -391,6 +454,33 @@ function App() {
                 <span>DESIGN STUDY — 001</span>
               </div>
             </div>
+          </div>
+
+          <div className="reference-gallery" aria-label="Mushroom product photography">
+            <figure className="reference-gallery-item reference-gallery-wide">
+              <img
+                src="https://cdn.prod.website-files.com/6582de88729189e29e26b192/658433d4b284fdbbe2689087_mushroom-image-04.webp"
+                alt="Mushroom wireless charger product study"
+                loading="lazy"
+              />
+              <figcaption>01 / FORM IN FOCUS</figcaption>
+            </figure>
+            <figure className="reference-gallery-item">
+              <img
+                src="https://cdn.prod.website-files.com/6582de88729189e29e26b192/658433b3b4dc9888ab1fa9bd_mushroom-image-05.webp"
+                alt="Mushroom charger detail"
+                loading="lazy"
+              />
+              <figcaption>02 / THE DETAILS</figcaption>
+            </figure>
+            <figure className="reference-gallery-item">
+              <img
+                src="https://cdn.prod.website-files.com/6582de88729189e29e26b192/658433b3e60fa02f659fee37_mushroom-image-06.webp"
+                alt="Mushroom charger in its environment"
+                loading="lazy"
+              />
+              <figcaption>03 / EVERYDAY OBJECT</figcaption>
+            </figure>
           </div>
         </section>
 
